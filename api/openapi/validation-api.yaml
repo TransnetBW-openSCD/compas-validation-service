@@ -1,0 +1,193 @@
+openapi: 3.0.3
+info:
+  title: COMPAS Validation Service API
+  description: |
+    API for validating SCL (Substation Configuration Description) XML resources using XPath rules.
+  version: 1.0.0
+  contact:
+    name: LF Energy COMPAS
+    url: https://github.com/com-pas/compas-validation-service
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://api.compas.lfenergy.org
+    description: Production server
+
+tags:
+  - name: Validation
+    description: Operations for validating SCL resources
+
+paths:
+  /api/v1/validate:
+    post:
+      tags:
+        - Validation
+      summary: Validate SCL resource (Multipart Upload)
+      description: |
+        Validates an XML SCL resource by streaming files via multipart/form-data.
+        This endpoint is optimized for large SCD/SCL files and supports XPath validation.
+        
+        **Benefits:**
+        - Efficient streaming for large XML files
+        - No need to encode files in JSON
+        - Supports file uploads directly from disk
+        - Better memory utilization
+      operationId: validateSclUpload
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - sclFile
+              properties:
+                sclFile:
+                  type: string
+                  format: binary
+                  description: The SCL/SCD XML file to validate
+                sclFileExtension:
+                  type: string
+                  enum:
+                    - ICD
+                    - SCD
+                    - SSD
+                    - CID
+                    - IID
+                    - SED
+                  description: |
+                    Type of SCL file to validate.
+                rulesFile:
+                  type: string
+                  format: binary
+                  description: |
+                    Validation rules as a file upload (in XPath format).
+                rulesJson:
+                  type: string
+                  description: |
+                    Array of validation rules as a stringified json.
+                    For XPath: e.g. "[{"context":"/","assert":"count(//*[local-name()=\"Substation\"]) = 2"}]".
+                    Optional — mutually exclusive with 'rulesFile'.
+                  example: "//Substation[@name='']"
+            encoding:
+              sclFile:
+                contentType: application/xml, text/xml
+              rulesFile:
+                contentType: text/plain, application/octet-stream
+      responses:
+        '200':
+          description: Validation completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+              examples:
+                validDocument:
+                  summary: Valid SCL file
+                  value:
+                    valid: true
+                    errors: []
+        '400':
+          description: Bad request - Invalid input or missing files
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Invalid multipart request"
+                details: "sclFile is required"
+        '413':
+          description: Payload too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "File too large"
+                details: "Maximum file size is 50MB"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "Validation processing failed"
+                details: "Unable to parse XML content"
+
+components:
+  schemas:
+    ValidationResponse:
+      type: object
+      required:
+        - valid
+        - errors
+      properties:
+        valid:
+          type: boolean
+          description: Whether the SCL resource passed all validation rules
+          example: true
+        errors:
+          type: array
+          description: List of validation errors (empty if valid is true)
+          items:
+            $ref: '#/components/schemas/ValidationError'
+    ValidationError:
+      type: object
+      required:
+        - ruleName
+        - message
+      properties:
+        ruleName:
+          type: string
+          description: The name/identifier of the validation rule that failed
+          example: "SubstationNameRequired"
+        message:
+          type: string
+          description: Human-readable description of the validation error
+          example: "Substation must have a name attribute"
+        xpath:
+          type: string
+          description: XPath location of the error in the XML document
+          example: "/SCL/Substation[1]"
+        severity:
+          type: string
+          description: Severity level of the validation error
+          enum:
+            - ERROR
+            - WARNING
+            - INFO
+          example: "ERROR"
+        lineNumber:
+          type: integer
+          description: Line number of the error in the XML document
+          example: 42
+    XpathRule:
+      type: object
+      required:
+        - context
+        - assert
+      properties:
+        context:
+          type: string
+          description: The nodes in the XML document to which the validation rule applies
+          example: "/"
+        assert:
+          type: string
+          description: The XPath expression that defines the validation rule
+          example: "count(//*[local-name()=\"Substation\"]) = 2"
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "Invalid request"
+        details:
+          type: string
+          description: Detailed error information
+          example: "sclContent cannot be null or empty"

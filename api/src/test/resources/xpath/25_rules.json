@@ -1,0 +1,102 @@
+[
+  {
+    "context": "/SCL/Header",
+    "assertion": "@id!=''"
+  },
+  {
+    "context": "/SCL/Header",
+    "assertion": "@version!=''"
+  },
+  {
+    "context": "/SCL/Substation",
+    "assertion": "count(VoltageLevel) > 0"
+  },
+  {
+    "context": "//VoltageLevel",
+    "assertion": "@nomFreq=50 or @nomFreq=60"
+  },
+  {
+    "context": "//Bay",
+    "assertion": "@name!=''"
+  },
+  {
+    "context": "/SCL/Communication/SubNetwork",
+    "assertion": "@type='8-MMS'"
+  },
+  {
+    "context": "//ConnectedAP",
+    "assertion": "@iedName!=''"
+  },
+  {
+    "context": "//ConnectedAP",
+    "assertion": "Address/P[@type='IP']"
+  },
+  {
+    "context": "//P[@type='IP']",
+    "assertion": "string-length(text()) > 6"
+  },
+  {
+    "context": "//IED",
+    "assertion": "@name!=''"
+  },
+  {
+    "context": "//IED",
+    "assertion": "AccessPoint"
+  },
+  {
+    "context": "//AccessPoint",
+    "assertion": "Server"
+  },
+  {
+    "context": "//Server",
+    "assertion": "LDevice"
+  },
+  {
+    "context": "//LDevice",
+    "assertion": "@inst!=''"
+  },
+  {
+    "context": "//LDevice",
+    "assertion": "LN0"
+  },
+  {
+    "context": "//LN0",
+    "assertion": "DataSet"
+  },
+  {
+    "context": "//DataSet",
+    "assertion": "FCDA"
+  },
+  {
+    "context": "//FCDA",
+    "assertion": "@ldInst!=''"
+  },
+  {
+    "context": "//FCDA",
+    "assertion": "@lnClass!=''"
+  },
+  {
+    "context": "//FCDA",
+    "assertion": "@fc='ST' or @fc='MX'"
+  },
+  {
+    "context": "//ReportControl",
+    "assertion": "@name!=''"
+  },
+  {
+    "context": "//ReportControl",
+    "assertion": "@datSet!=''"
+  },
+  {
+    "context": "//ReportControl",
+    "assertion": "@buffered='true' or @buffered='false'"
+  },
+  {
+    "context": "//ReportControl",
+    "assertion": "number(@confRev) >= 1"
+  },
+  {
+    "context": "//LN",
+    "assertion": "@lnClass!=''"
+  }
+]

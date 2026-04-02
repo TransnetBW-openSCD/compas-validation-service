@@ -1,0 +1,26 @@
+name: Publish to GitHub Packages
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - uses: whelk-io/maven-settings-xml-action@v22
+        with:
+          servers: '[{ "id": "github", "username": "OWNER", "password": "${{ secrets.GITHUB_TOKEN }}" }]'
+      - name: Publish package
+        run: mvn deploy -DskipTests

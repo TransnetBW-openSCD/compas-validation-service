@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # JVM-based Quarkus application
+  compas-validation-jvm:
+    build:
+      context: ./app
+      dockerfile: src/main/docker/Dockerfile.jvm
+    image: compas-validation/app:jvm-1.0-SNAPSHOT
+    container_name: compas-validation-jvm
+    ports:
+      - "8080:8080"
+    environment:
+      - QUARKUS_HTTP_HOST=0.0.0.0
+      - JAVA_OPTS_APPEND=-Xmx512m -XX:MaxRAMPercentage=75.0
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/q/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    profiles:
+      - jvm
+
+  # Native Quarkus application
+  compas-validation-native:
+    build:
+      context: ./app
+      dockerfile: src/main/docker/Dockerfile.native
+    image: compas-validation/app:native-1.0-SNAPSHOT
+    container_name: compas-validation-native
+    ports:
+      - "8080:8080"
+    environment:
+      - QUARKUS_HTTP_HOST=0.0.0.0
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/q/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    profiles:
+      - native
+
+
+networks:
+  default:
+    name: compas-validation-network
+
+volumes:
+  logs:
+    driver: local

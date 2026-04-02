@@ -1,0 +1,6 @@
+[
+  {
+    "context": "//SCL/Substation",
+    "assertion": "not(contains(normalize-space(@name), 't'))"
+  }
+]
