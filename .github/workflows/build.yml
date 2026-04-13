@@ -30,6 +30,14 @@ jobs:
         with:
           servers: '[{ "id": "github", "username": "OWNER", "password": "${{ secrets.GITHUB_TOKEN }}" }]'
 
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
       - name: Set short git commit SHA
         id: vars
         run: |
