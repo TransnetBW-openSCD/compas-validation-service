@@ -30,6 +30,12 @@ jobs:
         with:
           servers: '[{ "id": "github", "username": "OWNER", "password": "${{ secrets.GITHUB_TOKEN }}" }]'
 
+      - name: Set short git commit SHA
+        id: vars
+        run: |
+          calculatedSha=$(git rev-parse --short ${{ github.sha }})
+          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+
       - name: Build and Test with Maven
         run: mvn verify -B
 
