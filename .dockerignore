@@ -1,4 +1,5 @@
 **/target/
+!app/target/quarkus-app/
 *.md
 .git/
 .gitignore
