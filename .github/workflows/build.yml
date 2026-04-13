@@ -39,17 +39,17 @@ jobs:
       - name: Build and Test with Maven
         run: mvn verify -B
 
-      # - name: Login to Azure Container Registry
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: compasacr.azurecr.io
-      #     username: CompasAcr
-      #     password: ${{ secrets.AZURE_GITHUB_REGISTRY_PASSWORD }}
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: compasacr.azurecr.io
+          username: CompasAcr
+          password: ${{ secrets.AZURE_GITHUB_REGISTRY_PASSWORD }}
 
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@v6.15.0
         with:
           context: .
-          push: false
-          tags: compasacr.azurecr.io/bearingpoint/compas/compas-validation-service:${{ env.COMMIT_SHORT_SHA }}
+          push: true
+          tags: compasacr.azurecr.io/compas/compas-validation-service:${{ env.COMMIT_SHORT_SHA }}
