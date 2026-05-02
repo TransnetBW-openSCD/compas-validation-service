@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   build-and-test:
@@ -42,12 +43,12 @@ jobs:
       - name: Build and Test with Maven
         run: mvn verify -B
 
-      - name: Login to Azure Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: compasacr.azurecr.io
-          username: CompasAcr
-          password: ${{ secrets.AZURE_GITHUB_REGISTRY_PASSWORD }}
+      # - name: Log in to GitHub Container Registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
         id: push
@@ -55,4 +56,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: compasacr.azurecr.io/compas/compas-validation-service:${{ env.COMMIT_SHORT_SHA }}
+          tags: ghcr.io/${{ github.repository_owner }}/compas-validation-service:${{ env.COMMIT_SHORT_SHA }}
