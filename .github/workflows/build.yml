@@ -34,11 +34,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Set short git commit SHA
+      - name: Set build image variables
         id: vars
         run: |
           calculatedSha=$(git rev-parse --short ${{ github.sha }})
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+          echo "REPO_OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build and Test with Maven
         run: mvn verify -B
@@ -49,4 +50,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ lower(github.repository_owner) }}/compas-validation-service:${{ env.COMMIT_SHORT_SHA }}
+          tags: ghcr.io/${{ env.REPO_OWNER }}/compas-validation-service:${{ env.COMMIT_SHORT_SHA }}
