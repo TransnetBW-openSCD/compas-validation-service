@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import io.quarkus.test.security.TestSecurity;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -16,6 +17,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.lfenergy.compas.validation.utils.FileTestUtils.stringifyFile;
 
 @QuarkusTest
+@TestSecurity(user = "test-user", roles = {"SCL_VALIDATION"})
 class XPathValidationResourceTest {
 
     @Test
